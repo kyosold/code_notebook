@@ -15,7 +15,7 @@
  * @param ret_length result length
  * @return Returns the 8-bit binary string. Fail return NULL
  */
-unsigned char *s_quoted_printable_decode(const char *str, size_t str_len, size_t *ret_length)
+unsigned char *s_quoted_printable_decode_alloc(const char *str, size_t str_len, size_t *ret_length)
 {
     register unsigned int i;
     register unsigned const char *p1;
@@ -134,9 +134,9 @@ unsigned char *s_quoted_printable_decode(const char *str, size_t str_len, size_t
  * @param str The input string.
  * @param str_len string length
  * @param ret_length result length
- * @return Returns the encoded string. Fail return NULL
+ * @return Returns the encoded string, to be freed with free(). Fail return NULL
  */
-unsigned char *s_quoted_printable_encode(const char *str, size_t str_len, size_t *ret_length)
+unsigned char *s_quoted_printable_encode_alloc(const char *str, size_t str_len, size_t *ret_length)
 {
     unsigned long lp = 0;
     unsigned char c, *ret, *d;
@@ -199,10 +199,10 @@ unsigned char *s_quoted_printable_encode(const char *str, size_t str_len, size_t
 int main(int argc, char **argv)
 {
     size_t outlen = 0;
-    char *out = s_quoted_printable_encode(argv[1], strlen(argv[1]), &outlen);
+    char *out = s_quoted_printable_encode_alloc(argv[1], strlen(argv[1]), &outlen);
     printf("%d:%s\n", outlen, out);
 
-    char *out2 = s_quoted_printable_decode(out, outlen, &outlen);
+    char *out2 = s_quoted_printable_decode_alloc(out, outlen, &outlen);
     printf("%d:%s\n", outlen, out2);
 
     if (out)

@@ -34,9 +34,9 @@ static const short base64_reverse_table[256] = {
  * @param str The data to encode
  * @param length 'str' length
  * @param ret_length result length
- * @return The encoded data, as a string. Fail return NULL
+ * @return The encoded data, as a string, to be freed with free(). Fail return NULL
  */
-unsigned char *base64_encode(const unsigned char *str, int length, int *ret_length)
+unsigned char *base64_encode_alloc(const unsigned char *str, int length, int *ret_length)
 {
     const unsigned char *current = str;
     unsigned char *p;
@@ -100,9 +100,9 @@ unsigned char *base64_encode(const unsigned char *str, int length, int *ret_leng
  * @param str The encoded data
  * @param length 'str' length
  * @param ret_length result length
- * @return Returns the decoded data or false on failure. The returned data may be binary. Fail return NULL
+ * @return Returns the decoded data or false on failure. The returned data may be binary, to be freed with free(). Fail return NULL
  */
-unsigned char *base64_decode(const unsigned char *str, int length, int *ret_length)
+unsigned char *base64_decode_alloc(const unsigned char *str, int length, int *ret_length)
 {
     const unsigned char *current = str;
     int ch, i = 0, j = 0, strict = 0, k;
@@ -187,10 +187,10 @@ unsigned char *base64_decode(const unsigned char *str, int length, int *ret_leng
 int main(int argc, char **argv)
 {
     int outlen = 0;
-    char *out = base64_encode(argv[1], strlen(argv[1]), &outlen);
+    char *out = base64_encode_alloc(argv[1], strlen(argv[1]), &outlen);
     printf("%d:%s\n", outlen, out);
 
-    char *out2 = base64_decode(out, outlen, &outlen);
+    char *out2 = base64_decode_alloc(out, outlen, &outlen);
     printf("%d:%s\n", outlen, out2);
 
     if (out)
