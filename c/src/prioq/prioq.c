@@ -165,7 +165,7 @@ void prioq_free(prioq *pq)
  * 
  * 需要调用 pq_clean 去释放内存
  */
-struct prioq *pq_new()
+struct prioq *spq_new()
 {
     struct prioq *pq = NULL;
     pq = (struct prioq *)malloc(sizeof(struct prioq));
@@ -184,7 +184,7 @@ struct prioq *pq_new()
  * @param pe 需要添加进去的成员
  * @return 0:succ, other is error
  */
-int pq_add(struct prioq *pq, struct prioq_elt *pe)
+int spq_add(struct prioq *pq, struct prioq_elt *pe)
 {
     if (pq == NULL || pe == NULL)
         return 1;
@@ -203,7 +203,7 @@ int pq_add(struct prioq *pq, struct prioq_elt *pe)
  * 
  * pe 取出来后，就会从 pqchan 中删除。
  */
-int pq_get(struct prioq *pq, struct prioq_elt *pe)
+int spq_get(struct prioq *pq, struct prioq_elt *pe)
 {
     if (pq == NULL)
         return 1;
@@ -221,7 +221,7 @@ int pq_get(struct prioq *pq, struct prioq_elt *pe)
  * 
  * 会把 pqchan 内部所有的 pe 也都释放掉
  */
-void pq_clean(struct prioq *pq)
+void spq_clean(struct prioq *pq)
 {
     if (pq == NULL)
         return;
@@ -238,7 +238,7 @@ void pq_clean(struct prioq *pq)
 void main(int argc, char **argv)
 {
     struct prioq *pqchan = NULL;
-    pqchan = pq_new();
+    pqchan = spq_new();
     if (pqchan == NULL)
     {
         printf("pq_new fail\n");
@@ -252,7 +252,7 @@ void main(int argc, char **argv)
         pe.id = i;
         // pe.dt = time(NULL);
         pe.dt = rand();
-        if (pq_add(pqchan, &pe))
+        if (spq_add(pqchan, &pe))
         {
             printf("add fail\n");
             return;
@@ -267,13 +267,13 @@ void main(int argc, char **argv)
     for (i = 1; i < 6; i++)
     {
         struct prioq_elt pe;
-        int ret = pq_get(pqchan, &pe);
+        int ret = spq_get(pqchan, &pe);
         if (ret == 1)
             printf("get pe:%ld fail\n", i);
         else
             printf("get pe:%ld [%ld]=>[%lu]\n", i, pe.id, pe.dt);
     }
 
-    pq_clean(pqchan);
+    spq_clean(pqchan);
 }
 #endif

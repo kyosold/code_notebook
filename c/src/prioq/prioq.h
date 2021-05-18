@@ -14,9 +14,9 @@ typedef struct prioq
     unsigned int size;
 } prioq;
 
-struct prioq *pq_new();
-int pq_add(struct prioq *pq, struct prioq_elt *pe);
-int pq_get(struct prioq *pq, struct prioq_elt *pe);
-void pq_clean(struct prioq *pq);
+struct prioq *spq_new();
+int spq_add(struct prioq *pq, struct prioq_elt *pe);
+int spq_get(struct prioq *pq, struct prioq_elt *pe);
+void spq_clean(struct prioq *pq);
 
 #endif
