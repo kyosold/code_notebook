@@ -89,6 +89,7 @@ char *s_iconv_string_alloc(const char *in_p, size_t in_len,
 }
 
 #define _TEST
+// gcc -g siconv.c -liconv
 void main(int argc, char **argv)
 {
     char src[] = "abcčde";
