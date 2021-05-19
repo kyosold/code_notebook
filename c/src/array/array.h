@@ -11,11 +11,11 @@
  */
 typedef struct array
 {
-    int n;          /* Number of entries in dictionary */
-    int size;       /* Storage size */
-    char **val;     /* List of string values */
-    char **key;     /* List of string keys */
-    unsigned *hash; /* List of hash values for keys */
+    unsigned int n;    /* Number of entries in dictionary */
+    unsigned int size; /* Storage size */
+    char **val;        /* List of string values */
+    char **key;        /* List of string keys */
+    unsigned *hash;    /* List of hash values for keys */
 } array;
 
 array *array_new(unsigned int size);

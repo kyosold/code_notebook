@@ -298,6 +298,16 @@ void array_unset(array *a, char *key)
 }
 
 /**
+ * @brief Count all elements in an array
+ * @param An array
+ * @return Returns the number of elements in array.
+ */
+unsigned int array_count(array *a)
+{
+    return a->n;
+}
+
+/**
  * @brief   Join array elements with a string
  * @param   sep     Specifies what to place between the elements of an array
  * @param   a       array of strings to implode
