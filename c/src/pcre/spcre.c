@@ -95,8 +95,7 @@ int s_pcre_match_alloc(const char *str, size_t str_len, const char *pattern, cha
 
                     ml[i] = strdup(*p);
 
-                    // 目前不知道命中多少
-                    printf("[MATCHED]: %s\n", *p);
+                    // printf("[MATCHED]: %s\n", *p);
                     p++;
                     i++;
                 }
@@ -230,7 +229,12 @@ void main(int argc, char **argv)
                                     &ml, &ml_num,
                                     err, sizeof(err));
 
-    printf("ret: %d\n", is_matched);
+    if (is_matched == SPCRE_MATCHED)
+        printf("ret: MATCHED\n");
+    else if (is_matched == SPCRE_NOMATCH)
+        printf("ret: NO MATCH\n");
+    else
+        printf("match error: %s\n", err);
 
     if (is_matched == SPCRE_MATCHED)
     {
@@ -244,5 +248,14 @@ void main(int argc, char **argv)
         // free(ml);
         s_pcre_matched_free(ml, ml_num);
     }
+
+    is_matched = s_pcre_match(str, strlen(str), pattern,
+                              err, sizeof(err));
+    if (is_matched == SPCRE_MATCHED)
+        printf("ret: MATCHED\n");
+    else if (is_matched == SPCRE_NOMATCH)
+        printf("ret: NO MATCH\n");
+    else
+        printf("match error: %s\n", err);
 }
 #endif
