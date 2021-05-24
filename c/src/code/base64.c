@@ -32,17 +32,17 @@ static const short base64_reverse_table[256] = {
 /**
  * @brief Encodes data with MIME base64
  * @param str The data to encode
- * @param length 'str' length
+ * @param str_len 'str' length
  * @param ret_length result length
  * @return The encoded data, as a string, to be freed with free(). Fail return NULL
  */
-unsigned char *base64_encode_alloc(const unsigned char *str, int length, int *ret_length)
+unsigned char *base64_encode_alloc(const unsigned char *str, int str_len, int *ret_length)
 {
     const unsigned char *current = str;
     unsigned char *p;
     unsigned char *result;
 
-    if ((length + 2) < 0 || ((length + 2) / 3) >= (1 << (sizeof(int) * 8 - 2)))
+    if ((str_len + 2) < 0 || ((str_len + 2) / 3) >= (1 << (sizeof(int) * 8 - 2)))
     {
         if (ret_length != NULL)
         {
@@ -51,14 +51,14 @@ unsigned char *base64_encode_alloc(const unsigned char *str, int length, int *re
         return NULL;
     }
 
-    result = (unsigned char *)malloc((((length + 2) / 3) * 4) * sizeof(char));
+    result = (unsigned char *)malloc((((str_len + 2) / 3) * 4) * sizeof(char) + 1);
     if (result == NULL)
     {
         return NULL;
     }
     p = result;
 
-    while (length > 2)
+    while (str_len > 2)
     {
         /* keep going until we have less than 24 bits */
         *p++ = base64_table[current[0] >> 2];
@@ -67,14 +67,14 @@ unsigned char *base64_encode_alloc(const unsigned char *str, int length, int *re
         *p++ = base64_table[current[2] & 0x3f];
 
         current += 3;
-        length -= 3; // we just handle 3 octets of data
+        str_len -= 3; // we just handle 3 octets of data
     }
 
     /* now deal with the tail end of things */
-    if (length != 0)
+    if (str_len != 0)
     {
         *p++ = base64_table[current[0] >> 2];
-        if (length > 1)
+        if (str_len > 1)
         {
             *p++ = base64_table[((current[0] & 0x03) << 4) + (current[1] >> 4)];
             *p++ = base64_table[(current[1] & 0x0f) << 2];
@@ -98,23 +98,23 @@ unsigned char *base64_encode_alloc(const unsigned char *str, int length, int *re
 /**
  * @brief Decodes data encoded with MIME base64
  * @param str The encoded data
- * @param length 'str' length
+ * @param str_len 'str' length
  * @param ret_length result length
  * @return Returns the decoded data or false on failure. The returned data may be binary, to be freed with free(). Fail return NULL
  */
-unsigned char *base64_decode_alloc(const unsigned char *str, int length, int *ret_length)
+unsigned char *base64_decode_alloc(const unsigned char *str, int str_len, int *ret_length)
 {
     const unsigned char *current = str;
     int ch, i = 0, j = 0, strict = 0, k;
     /* this sucks for threaded environments */
     unsigned char *result;
 
-    result = (unsigned char *)malloc(length + 1);
+    result = (unsigned char *)malloc(str_len + 1);
     if (result == NULL)
         return NULL;
 
     /* run through the whole string, converting as we go */
-    while ((ch = *current++) != '\0' && length-- > 0)
+    while ((ch = *current++) != '\0' && str_len-- > 0)
     {
         if (ch == base64_pad)
         {
