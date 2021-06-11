@@ -163,6 +163,7 @@ int schar_cat(schar *dest, schar *source)
     return schar_catb(dest, source->s, source->len);
 }
 
+
 char *schar_strtolower(char *s, size_t len)
 {
     unsigned char *c, *e;
@@ -425,7 +426,7 @@ void schar_clean(schar *x)
 
 /**
  * @brief 初始并生成一个schar结构指针
- * @return schar *, 失败返回 NULL
+ * @return schar *, 失败返回 NULL, to be free use schar_delete()
  */
 schar *schar_new()
 {
