@@ -105,6 +105,32 @@ int check_certs(SSL *ssl)
 }
 
 /**
+ * @brief 设置使用双向验证，即：验证客户端的证书
+ * @param ctx       Pointer to SSL_CTX object
+ * @param cafile    The CA certificate(*.crt)
+ * @param err       The error string
+ * @param err_size  The memory size of err
+ * @return 0:succ, -1:fail and check err
+ */
+int sock_ssl_use_2way_auth(SSL_CTX *ctx, char *cafile, char *err, size_t err_size)
+{
+    // 双向验证
+    // SSL_VERIFY_PEER---要求对证书进行认证，没有证书也会放行
+    // SSL_VERIFY_FAIL_IF_NO_PEER_CERT---要求客户端需要提供证书，但验证发现单独使用没有证书也会放行
+    SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT, NULL);
+
+    // 设置信任根证书
+    if (SSL_CTX_load_verify_locations(ctx, cafile, NULL) <= 0)
+    {
+        snprintf(err, err_size,
+                 "SSL_CTX_load_verify_locations: %s",
+                 get_error_info());
+        return -1;
+    }
+    return 0;
+}
+
+/**
  * @brief Creates a new SSL_CTX object
  * @param type      The special is server or client: 0(server), 1(client)
  * @param crtfile   The certificate file
@@ -603,15 +629,20 @@ typedef struct client
 
 int main(int argc, char **argv)
 {
+    if (argc != 4 && argc != 5)
+    {
+        printf("Usage: %s <port|service name> <crt> <key>\n", argv[0]);
+        printf("two-way auth: %s <port> <server crt> <server key> <ca crt>\n", argv[0]);
+        return 1;
+    }
+
     char *port = argv[1];
     char *crtfile = argv[2];
     char *keyfile = argv[3];
+    char *cafile = NULL;
 
-    if (argc != 4)
-    {
-        printf("Usage: %s <port|service name> <crt> <key>\n", argv[0]);
-        return 1;
-    }
+    if (argc == 5)
+        cafile = argv[4];
 
     sig_catch(SIGPIPE, SIG_IGN);
 
@@ -636,6 +667,16 @@ int main(int argc, char **argv)
     {
         printf("%s\n", err);
         return 1;
+    }
+
+    if (cafile)
+    {
+        // 设置双向认证
+        if (sock_ssl_use_2way_auth(ctx, cafile, err, err_size) == -1)
+        {
+            printf("Fail: %s\n", err);
+            return 1;
+        }
     }
 
     int max_client_num = 10;
@@ -714,6 +755,14 @@ int main(int argc, char **argv)
                     snprintf(sbuf, sizeof(sbuf), "Greeting...\n");
                     ret = sock_ssl_write(c->ssl, c->fd, sbuf, strlen(sbuf), 3, err, err_size);
                     printf("ssl write %d:%s", ret, sbuf);
+
+                    int ret = check_certs(c->ssl);
+                    if (ret == -2)
+                        printf("Client is no certificate\n");
+                    else if (ret == -1)
+                        printf("Client certificate check fail\n");
+                    else
+                        printf("Client certificat check succ\n");
                 }
                 else
                 {
@@ -904,6 +953,14 @@ int main(int argc, char **argv)
     }
     if (_debug)
         printf("ssl connect succ\n");
+
+    ret = check_certs(ssl);
+    if (ret == -2)
+        printf("Server is no certificate\n");
+    else if (ret == -1)
+        printf("Server certificate check fail\n");
+    else
+        printf("Server certificat check succ\n");
 
     int i;
     fd_set rfds, afds;
