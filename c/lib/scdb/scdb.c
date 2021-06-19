@@ -214,6 +214,7 @@ CFAIL:
     return NULL;
 }
 
+#ifdef _TEST
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
@@ -243,3 +244,4 @@ void main(int argc, char **argv)
     else
         printf("Get key:%s -> Not Found\n", key);
 }
+#endif
