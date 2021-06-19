@@ -190,7 +190,7 @@ int scdb_make_finish(struct scdb_make *c)
  * @param fn        需要被生成的文件
  * @param sep       文件内每行按什么分隔区分key与val, (name=value, sep is =)
  * @param cdb_fn    生成的 cdb 文件名
- * @return 0:succ, -1:fail
+ * @return -1:fail, 返回生成的行数.
  */
 int scdb_make_gen_file(char *fn, char sep, char *cdb_fn)
 {
@@ -199,6 +199,7 @@ int scdb_make_gen_file(char *fn, char sep, char *cdb_fn)
     char *tok = NULL;
     int fd = -1;
     FILE *fp = NULL;
+    int num = 0;
 
     fp = fopen(fn, "r");
     if (!fp)
@@ -222,6 +223,8 @@ int scdb_make_gen_file(char *fn, char sep, char *cdb_fn)
 
         if (scdb_make_add(&c, buf, strlen(buf), tok + 1, strlen(tok + 1)) == -1)
             goto SFAIL;
+
+        num++;
     }
 
     if (!feof(fp))
@@ -238,7 +241,7 @@ int scdb_make_gen_file(char *fn, char sep, char *cdb_fn)
     fclose(fp);
     close(fd);
 
-    return 0;
+    return num;
 
 SFAIL:
     if (fp != NULL)
