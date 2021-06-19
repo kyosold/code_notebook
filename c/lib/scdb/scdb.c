@@ -215,6 +215,7 @@ CFAIL:
 }
 
 #ifdef _TEST
+
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
