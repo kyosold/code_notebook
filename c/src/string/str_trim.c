@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-#include "strim.h"
+#include "str_trim.h"
 
 /**
  * @return 0:succ, 1:fail
@@ -97,7 +97,7 @@ void _s_trim(char *str, int len, char *what, int what_len, int mode, int *t, int
     *l = len;
 }
 
-void ltrim(char *str, int str_len, char *what, int what_len, char *str_trimmed, int str_trimmed_size)
+void str_ltrim(char *str, int str_len, char *what, int what_len, char *str_trimmed, int str_trimmed_size)
 {
     int trimmed = 0;
     int len = 0;
@@ -108,7 +108,7 @@ void ltrim(char *str, int str_len, char *what, int what_len, char *str_trimmed, 
     str_trimmed[len] = '\0';
 }
 
-void rtrim(char *str, int str_len, char *what, int what_len, char *str_trimmed, int str_trimmed_size)
+void str_rtrim(char *str, int str_len, char *what, int what_len, char *str_trimmed, int str_trimmed_size)
 {
     int trimmed = 0;
     int len = 0;
@@ -128,7 +128,7 @@ void rtrim(char *str, int str_len, char *what, int what_len, char *str_trimmed, 
  * @param str_trimmed   The trimmed string
  * @param str_trimmed_size  The trimmed string memory size
  */
-void trim(char *str, int str_len, char *what, int what_len, char *str_trimmed, int str_trimmed_size)
+void str_trim(char *str, int str_len, char *what, int what_len, char *str_trimmed, int str_trimmed_size)
 {
     int trimmed = 0;
     int len = 0;
@@ -139,7 +139,7 @@ void trim(char *str, int str_len, char *what, int what_len, char *str_trimmed, i
     str_trimmed[len] = '\0';
 }
 
-char *ltrim_alloc(char *str, int str_len, char *what, int what_len)
+char *str_ltrim_alloc(char *str, int str_len, char *what, int what_len)
 {
     int trimmed = 0;
     int len = 0;
@@ -150,7 +150,7 @@ char *ltrim_alloc(char *str, int str_len, char *what, int what_len)
     return s;
 }
 
-char *rtrim_alloc(char *str, int str_len, char *what, int what_len)
+char *str_rtrim_alloc(char *str, int str_len, char *what, int what_len)
 {
     int trimmed = 0;
     int len = 0;
@@ -169,7 +169,7 @@ char *rtrim_alloc(char *str, int str_len, char *what, int what_len)
  * @param what_len  The length of what
  * @return The trimmed string, to be free memory use free()
  */
-char *trim_alloc(char *str, int str_len, char *what, int what_len)
+char *str_trim_alloc(char *str, int str_len, char *what, int what_len)
 {
     int trimmed = 0;
     int len = 0;
@@ -190,13 +190,13 @@ int main(int argc, char **argv)
 
     // 第一种使用方法
     char str[1024] = {0};
-    trim(content, strlen(content), sed, strlen(sed), str, sizeof(str));
+    str_trim(content, strlen(content), sed, strlen(sed), str, sizeof(str));
     printf("(%s)\n", str);
 
     // 第二种使用方法
     // what使用默认的NULL，则为 (” \t\n\r\v\0“) 6种
     // 最后记得释放内存
-    char *ss = trim_alloc(content, strlen(content), NULL, 0);
+    char *ss = str_trim_alloc(content, strlen(content), NULL, 0);
     printf("(%s)\n", ss);
     free(ss);
 
