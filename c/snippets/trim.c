@@ -96,22 +96,23 @@ void _s_trim(char *str, int len, char *what, int what_len, int mode, int *t, int
     *l = len;
 }
 
-/**
- * @brief Strip whitespace (or other characters) from the beggining and end of a string
- * @param str       The string that will be trimmed
- * @param str_len   Then length of str
- * @param what      The stripped characters, NULL->default (' \t\n\r\v\0')
- * @param what_len  The length of what
- * @param mode      1:trim left, 2:trim right, 3:trim left and right
- * @param str_trimmed   The trimmed string
- * @param str_trimmed_size  The trimmed string memory size
- */
-void trim(char *str, int str_len, char *what, int what_len, int mode, char *str_trimmed, int str_trimmed_size)
+void ltrim(char *str, int str_len, char *what, int what_len, char *str_trimmed, int str_trimmed_size)
 {
     int trimmed = 0;
     int len = 0;
 
-    _s_trim(str, str_len, what, what_len, mode, &trimmed, &len);
+    _s_trim(str, str_len, what, what_len, 1, &trimmed, &len);
+
+    snprintf(str_trimmed, str_trimmed_size, "%s", str + trimmed);
+    str_trimmed[len] = '\0';
+}
+
+void rtrim(char *str, int str_len, char *what, int what_len, char *str_trimmed, int str_trimmed_size)
+{
+    int trimmed = 0;
+    int len = 0;
+
+    _s_trim(str, str_len, what, what_len, 2, &trimmed, &len);
 
     snprintf(str_trimmed, str_trimmed_size, "%s", str + trimmed);
     str_trimmed[len] = '\0';
@@ -123,15 +124,56 @@ void trim(char *str, int str_len, char *what, int what_len, int mode, char *str_
  * @param str_len   Then length of str
  * @param what      The stripped characters, NULL->default (' \t\n\r\v\0')
  * @param what_len  The length of what
- * @param mode      1:trim left, 2:trim right, 3:trim left and right
- * @return The trimmed string, to be free memory use free()
+ * @param str_trimmed   The trimmed string
+ * @param str_trimmed_size  The trimmed string memory size
  */
-char *trim_alloc(char *str, int str_len, char *what, int what_len, int mode)
+void trim(char *str, int str_len, char *what, int what_len, char *str_trimmed, int str_trimmed_size)
 {
     int trimmed = 0;
     int len = 0;
 
-    _s_trim(str, str_len, what, what_len, mode, &trimmed, &len);
+    _s_trim(str, str_len, what, what_len, 3, &trimmed, &len);
+
+    snprintf(str_trimmed, str_trimmed_size, "%s", str + trimmed);
+    str_trimmed[len] = '\0';
+}
+
+char *ltrim_alloc(char *str, int str_len, char *what, int what_len)
+{
+    int trimmed = 0;
+    int len = 0;
+
+    _s_trim(str, str_len, what, what_len, 1, &trimmed, &len);
+
+    char *s = strndup(str + trimmed, len);
+    return s;
+}
+
+char *rtrim_alloc(char *str, int str_len, char *what, int what_len)
+{
+    int trimmed = 0;
+    int len = 0;
+
+    _s_trim(str, str_len, what, what_len, 2, &trimmed, &len);
+
+    char *s = strndup(str + trimmed, len);
+    return s;
+}
+
+/**
+ * @brief Strip whitespace (or other characters) from the beggining and end of a string
+ * @param str       The string that will be trimmed
+ * @param str_len   Then length of str
+ * @param what      The stripped characters, NULL->default (' \t\n\r\v\0')
+ * @param what_len  The length of what
+ * @return The trimmed string, to be free memory use free()
+ */
+char *trim_alloc(char *str, int str_len, char *what, int what_len)
+{
+    int trimmed = 0;
+    int len = 0;
+
+    _s_trim(str, str_len, what, what_len, 3, &trimmed, &len);
 
     char *s = strndup(str + trimmed, len);
     return s;
@@ -144,17 +186,16 @@ int main(int argc, char **argv)
 {
     char *content = argv[1];
     char *sed = argv[2];
-    int mode = atoi(argv[3]);
 
     // 第一种使用方法
     char str[1024] = {0};
-    trim(content, strlen(content), sed, strlen(sed), mode, str, sizeof(str));
+    trim(content, strlen(content), sed, strlen(sed), str, sizeof(str));
     printf("(%s)\n", str);
 
     // 第二种使用方法
     // what使用默认的NULL，则为 (” \t\n\r\v\0“) 6种
     // 最后记得释放内存
-    char *ss = trim_alloc(content, strlen(content), NULL, 0, 3);
+    char *ss = trim_alloc(content, strlen(content), NULL, 0);
     printf("(%s)\n", ss);
     free(ss);
 
