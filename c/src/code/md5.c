@@ -312,7 +312,7 @@ void s_md5(const char *str, size_t str_len, int raw_output, char *result, size_t
     unsigned char digest[16];
 
     S_MD5Init(&context);
-    S_MD5Update(&context, str, strlen);
+    S_MD5Update(&context, str, str_len);
     S_MD5Final(digest, &context);
 
     if (raw_output)

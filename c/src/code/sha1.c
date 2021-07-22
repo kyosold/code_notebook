@@ -2,7 +2,7 @@
 #include <string.h>
 #include "sha1.h"
 
-void make_digest_ex(char *md5str, const unsigned char *digest, int len)
+void make_digest_ex_sha1(char *md5str, const unsigned char *digest, int len)
 {
     static const char hexits[17] = "0123456789abcdef";
     int i;
@@ -17,7 +17,7 @@ void make_digest_ex(char *md5str, const unsigned char *digest, int len)
 
 void make_sha1_digest(char *sha1str, unsigned char *digest)
 {
-    make_digest_ex(sha1str, digest, 20);
+    make_digest_ex_sha1(sha1str, digest, 20);
 }
 
 static void SHA1Transform(uint32_t[5], const unsigned char[64]);
@@ -331,7 +331,7 @@ void s_sha1(const char *str, size_t str_len, int raw_output, char *result, size_
     char sha1str[41] = {0};
 
     S_SHA1Init(&context);
-    S_SHA1Update(&context, str, strlen);
+    S_SHA1Update(&context, str, str_len);
     S_SHA1Final(digest, &context);
 
     if (raw_output)
@@ -340,7 +340,7 @@ void s_sha1(const char *str, size_t str_len, int raw_output, char *result, size_
     }
     else
     {
-        make_digest_ex(sha1str, digest, 20);
+        make_digest_ex_sha1(sha1str, digest, 20);
         snprintf(result, result_size, "%s", sha1str);
     }
 }
@@ -385,7 +385,7 @@ int s_sha1_file(const char *filename, int raw_output, char *result, size_t resul
     }
     else
     {
-        make_digest_ex(sha1str, digest, 20);
+        make_digest_ex_sha1(sha1str, digest, 20);
         snprintf(result, result_size, "%s", sha1str);
     }
 

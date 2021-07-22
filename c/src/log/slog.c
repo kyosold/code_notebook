@@ -21,7 +21,7 @@ static char *slog_priority[] = {
 void _slog_write(int level, const char *file, int line,
                  const char *fun, const char *fmt, ...)
 {
-    printf("level:%d slog_level:%d\n", level, slog_level);
+    // printf("level:%d slog_level:%d\n", level, slog_level);
     if (level > slog_level)
         return;
 
