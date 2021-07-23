@@ -104,19 +104,17 @@ int schar_cat(schar *dest, schar *source);
 
 /**
  * @brief 转换字符串为小写
- * @param s     需要被转换的字符串
- * @param len   字符串 s 的长度
- * @return 返回被转换的 s 
- * @note s 会被直接替换成小写，所以 s 会被修改
+ * @param x     需要被转换的 schar
+ * @note x 会被直接替换成小写，所以 x 会被修改
  * @see schar_strtoupper()
  */
-char *schar_strtolower(char *s, size_t len);
+void schar_strtolower(schar *x);
 /**
  * @brief 转换字符串为大写
  * 与上面相同
  * @see schar_strtolower()
  */
-char *schar_strtoupper(char *s, size_t len);
+void schar_strtoupper(schar *x);
 // ------------------------------------
 
 /**

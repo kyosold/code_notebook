@@ -163,8 +163,7 @@ int schar_cat(schar *dest, schar *source)
     return schar_catb(dest, source->s, source->len);
 }
 
-
-char *schar_strtolower(char *s, size_t len)
+char *_schar_strtolower(char *s, size_t len)
 {
     unsigned char *c, *e;
 
@@ -179,7 +178,12 @@ char *schar_strtolower(char *s, size_t len)
     return s;
 }
 
-char *schar_strtoupper(char *s, size_t len)
+void schar_strtolower(schar *x)
+{
+    _schar_strtolower(x->s, x->len);
+}
+
+char *_schar_strtoupper(char *s, size_t len)
 {
     unsigned char *c, *e;
 
@@ -192,6 +196,11 @@ char *schar_strtoupper(char *s, size_t len)
         c++;
     }
     return s;
+}
+
+void schar_strtoupper(schar *x)
+{
+    _schar_strtoupper(x->s, x->len);
 }
 
 char *_schar_memnstr(char *haystack, char *needle, int needle_len, char *end)
