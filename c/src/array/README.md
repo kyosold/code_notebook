@@ -13,7 +13,7 @@ typedef struct array
 } array
 ```
 
-## 通常用法
+## 一. 通常用法
 
 a. 引入头文件
 
@@ -96,7 +96,7 @@ array_del(ss_list);
 array_del(list);
 ```
 
-## 函数:
+## 二. 函数:
 
 ```
 array *array_new(unsigned int size);
