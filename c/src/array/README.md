@@ -104,7 +104,8 @@ array *array_new(unsigned int size);
 
 - size: 分配数组成员数量，设定为 0 则使用默认 128 个
 - 返回: 失败为 NULL, 成功为指向 array 的指针
-  > 在堆上分配的内存
+
+> 在堆上分配的内存
 
 ```
 int array_set(array *a, char *key, char *val);
