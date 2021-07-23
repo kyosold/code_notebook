@@ -10,9 +10,6 @@
 /* Minimal allocated number of entries in a array */
 #define ARRAYMINSZ 128
 
-/* Invalid key token */
-#define ARRAY_INVALID_KEY ((char *)-1)
-
 /*--------------------------------------
         Private functions
 --------------------------------------*/
@@ -256,7 +253,7 @@ int array_set(array *a, char *key, char *val)
  * @param    key     Key to remove.
  * @return   void
  * 
- * 这个函数删除字典中的一个键。如果找不到钥匙，就什么也做不了。
+ * 这个函数删除字典中的一个键。如果找不到 key，就什么也做不了。
  */
 void array_unset(array *a, char *key)
 {
@@ -305,6 +302,21 @@ void array_unset(array *a, char *key)
 unsigned int array_count(array *a)
 {
     return a->n;
+}
+
+unsigned int array_size(array *a)
+{
+    return a->size;
+}
+
+char *array_key(array *a, unsigned int i)
+{
+    return a->key[i];
+}
+
+char *array_value(array *a, unsigned int i)
+{
+    return a->val[i];
 }
 
 /**

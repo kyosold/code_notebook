@@ -18,6 +18,14 @@ typedef struct array
     unsigned *hash;    /* List of hash values for keys */
 } array;
 
+/* Invalid key token */
+#define ARRAY_INVALID_KEY ((char *)-1)
+
+unsigned int array_count(array *a);
+unsigned int array_size(array *a);
+char *array_key(array *a, unsigned int i);
+char *array_value(array *a, unsigned int i);
+
 array *array_new(unsigned int size);
 void array_del(array *a);
 
