@@ -71,10 +71,10 @@ int main(int argc, char **argv)
     slog_info("Base64 ----");
     int outlen = 0;
     char *src_str = "123qwe";
-    char *out = base64_encode_alloc(src_str, strlen(src_str), &outlen);
+    char *out = s_base64_encode_alloc(src_str, strlen(src_str), &outlen);
     slog_info("src:%s base64 encode str:%s", src_str, out);
 
-    char *out2 = base64_decode_alloc(out, outlen, &outlen);
+    char *out2 = s_base64_decode_alloc(out, outlen, &outlen);
     slog_info("src:%s base64 decode str:%s", out, out2);
 
     free(out);
