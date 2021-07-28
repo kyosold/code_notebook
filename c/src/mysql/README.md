@@ -79,6 +79,14 @@ f. Disconnect mysql
 smysql_destroy(db);
 ```
 
+### 编译
+
+指定 libmysqlclient 库，例如:
+
+```bash
+-I/usr/include/ -L/usr/lib64/mysql -lmysqlclient
+```
+
 ## 二. 函数说明
 
 ```
