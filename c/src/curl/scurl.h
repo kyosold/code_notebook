@@ -30,4 +30,15 @@ int scurl_post(char *url, struct curl_slist *headers, char *post_data,
                char *save_cookie_fs, char *send_cookie_fs,
                struct scurl_resp_s *scurl_resp);
 
+int scurl_get(char *url, struct curl_slist *headers,
+              unsigned int connect_timeout, unsigned int timeout,
+              char *save_cookie_fs, char *send_cookie_fs,
+              struct scurl_resp_s *scurl_resp);
+
+int scurl_put_file(char *url, struct curl_slist *headers,
+                   char *upload_file,
+                   unsigned int connect_timeout, unsigned int timeout,
+                   char *save_cookie_fs, char *send_cookie_fs,
+                   struct scurl_resp_s *scurl_resp);
+
 #endif

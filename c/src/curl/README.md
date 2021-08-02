@@ -85,3 +85,41 @@ int scurl_get(char *url, struct curl_slist *headers,
 
 > 执行 http get 提交
 > scurl_resp 需要手动释放内存
+
+```
+int scurl_post(char *url, struct curl_slist *headers, char *post_data,
+            unsigned int connect_timeout, unsigned int timeout,
+            char *save_cookie_fs, char *send_cookie_fs,
+            struct scurl_resp_s *scurl_resp)
+```
+
+- url: 执行 http post 提交数据到指定的地址
+- headers: 指定自定义头，如果不需要则设置为 NULL
+- post_data: 需要 post 的数据
+- connect_timeou: 连接超时, 单位:秒
+- timeout: 执行提交的超时, 单位:秒
+- save_cookie_fs: 指定保存 cookie 信息的文件，不需要则设置 NULL
+- send_cookie_fs: 指定提交给 url 的本地 cookie 文件，不需要则设置 NULL
+- scurl_resp: 获取 http response 的信息
+- 返回: 0 成功，1 失败
+
+> 执行 http post 提交
+> scurl_resp 需要手动释放内存
+
+```
+int scurl_put_file(char *url, struct curl_slist *headers,
+                   char *upload_file,
+                   unsigned int connect_timeout, unsigned int timeout,
+                   char *save_cookie_fs, char *send_cookie_fs,
+                   struct scurl_resp_s *scurl_resp)
+```
+
+- url: 执行 upload 文件到指定的地址
+- headers: 指定自定义头，如果不需要则设置为 NULL
+- upload_file: 需要上传的文件
+- connect_timeou: 连接超时, 单位:秒
+- timeout: 执行提交的超时, 单位:秒
+- save_cookie_fs: 指定保存 cookie 信息的文件，不需要则设置 NULL
+- send_cookie_fs: 指定提交给 url 的本地 cookie 文件，不需要则设置 NULL
+- scurl_resp: 获取 http response 的信息
+- 返回: 0 成功，1 失败
