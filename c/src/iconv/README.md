@@ -28,6 +28,14 @@ printf("convert result:%d (%s)\n", dst_len, dst);
 free(dst);
 ```
 
+### 编译参数
+
+使用 -liconv
+
+```bash
+-I/usr/local/include/ -L/usr/local/lib/ -liconv
+```
+
 ## 函数说明
 
 ```
