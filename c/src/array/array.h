@@ -28,6 +28,7 @@ char *array_value(array *a, unsigned int i);
 
 array *array_new(unsigned int size);
 void array_del(array *a);
+int array_clean(array *a);
 
 char *array_get(array *a, char *key, char *def);
 int array_set(array *a, char *key, char *val);

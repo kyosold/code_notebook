@@ -106,6 +106,38 @@ void array_del(array *a)
 }
 
 /**
+ * @brief   Delete all items object
+ * @param a array object to delete all items
+ * @return the numbers of delete items
+ * 
+ * Deallocate all item and all memory associated to it.
+ */
+int array_clean(array *a)
+{
+    int i = 0;
+    if (a == NULL)
+        return 0;
+
+    for (i = 0; i < a->size; i++)
+    {
+        if (a->key[i] != NULL)
+        {
+            free(a->key[i]);
+            a->key[i] = NULL;
+        }
+        if (a->val[i] != NULL)
+        {
+            free(a->val[i]);
+            a->val[i] = NULL;
+        }
+        a->hash[i] = 0;
+    }
+    a->n = 0;
+
+    return i;
+}
+
+/**
  * @brief    Compute the hash key for a string.
  * @param    key     Character string to use for key.
  * @return   1 unsigned int on at least 32 bits.
@@ -493,6 +525,27 @@ void main(int argc, char **argv)
 
     printf("deallocating...\n");
     array_del(a);
+
+    array *aa = array_new(10);
+    for (i = 0; i < 10; i++)
+    {
+        sprintf(ckey, "%04d", i);
+        sprintf(cval, "%04d_val", i);
+        array_set(aa, ckey, cval);
+    }
+    array_dump(aa, stderr);
+    array_clean(aa);
+    printf("after array clean:\n");
+    array_dump(aa, stderr);
+    printf("add 5 item again\n");
+    for (i = 0; i < 5; i++)
+    {
+        sprintf(ckey, "%04d", i);
+        sprintf(cval, "%04d_val", i);
+        array_set(aa, ckey, cval);
+    }
+    array_dump(aa, stderr);
+    array_del(aa);
 
     return;
 }
