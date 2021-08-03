@@ -157,6 +157,7 @@ array *array_explode_alloc(char *sep, char *s);
 
 - sep: 按此字符串分隔
 - s: 需要被分隔的字符串
+- 返回: 分隔后的数组，使用 array_del 释放
 
 > 把字符串打散为数组，返回的数组需要手动调用 array_del() 释放内存
 
@@ -173,5 +174,6 @@ int array_clean(array *a)
 ```
 
 - a: 需要被释放成员的数组
+- 返回: 返回清理成员的数量
 
 > 该函数仅会把数组成员给释放掉，并不会释放数组本身，也就意味着下次不用再 array_new，但是 size 还是原来的大小。
