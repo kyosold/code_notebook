@@ -7,8 +7,8 @@
 #include <getopt.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-
 #include "utils.h"
+#include "version.h"
 
 unsigned char eolbyte = '\n';
 
@@ -75,6 +75,7 @@ void grep_str(struct matcher_t *matcher, char *buf, char *substr);
 void usage(char *prog)
 {
     printf("----------------------------------------------\n");
+    printf("Version: %s\n\n", VERSION);
     printf("Usage:\n");
     printf("  %s -v -s15 -e17 [pattern] [file]\n", prog);
     printf("\n");
@@ -111,7 +112,7 @@ int main(int argc, char **argv)
 
     // command
     int i, ch;
-    const char *args = "s:e:Sivh";
+    const char *args = "s:e:SivVh";
     while ((ch = getopt(argc, argv, args)) != -1)
     {
         switch (ch)
@@ -131,6 +132,9 @@ int main(int argc, char **argv)
         case 'S':
             matcher.show_filename = 1;
             break;
+        case 'V':
+            printf("Version: %s\n", VERSION);
+            exit(1);
         case 'h':
         default:
             usage(argv[0]);
