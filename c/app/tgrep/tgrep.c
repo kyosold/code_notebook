@@ -336,7 +336,7 @@ int get_pos(char *file, int match_hour, int v, int flag, struct ret_pos_t *ret_p
             ret_pos->pos = st.st_size;
         ret_pos->line_dt.hour = -1;
         ret_pos->line_dt.minute = -1;
-        goto SUCC_EXIT;
+        return 1;
     }
 
     struct datetime_line_t datetime_line;
@@ -610,7 +610,7 @@ void grep_str(struct matcher_t *matcher, char *buf, char *substr)
 
     if (pos != NULL)
     {
-        printf("[MATCH] pattern: %s\n", substr);
+        // printf("[MATCH] pattern: %s\n", substr);
         // found
         if (matcher->show_filename)
         {
