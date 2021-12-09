@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <libgen.h>
 
 unsigned long limit = 50;
 unsigned long num_child = 0;
@@ -40,10 +41,12 @@ void sigchld()
 
 void usage(char *prog)
 {
+    printf("-------------------------------\n");
     printf("Usage:\n");
-    printf("%s -c 100 program\n", prog);
-    printf("Params:\n");
-    printf("-c  max number of child");
+    printf("%s -c100 program\n", prog);
+    printf("\nOptions:\n");
+    printf("  -c  max number of child\n");
+    printf("-------------------------------\n");
     _exit(100);
 }
 
@@ -74,7 +77,7 @@ int main(int argc, char **argv)
     if (!program || !*program)
         usage(argv[0]);
 
-    openlog(argv[0], LOG_PID | LOG_NDELAY, LOG_MAIL);
+    openlog(basename(argv[0]), LOG_PID | LOG_NDELAY, LOG_MAIL);
 
     sig_block(SIGCHLD);
     sig_catch(SIGCHLD, sigchld);
@@ -103,7 +106,9 @@ int main(int argc, char **argv)
             sig_unblock(SIGCHLD);
             sig_uncatch(SIGTERM);
             sig_uncatch(SIGPIPE);
+
             sleep(10);
+
             printf("child exit.\n");
             _exit(250);
         }
