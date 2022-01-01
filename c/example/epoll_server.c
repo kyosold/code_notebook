@@ -126,6 +126,7 @@ void et_process(struct epoll_event *events, int number, int epoll_fd, int listen
                 {
                     printf("client disconnect\n");
                     close(sockfd);
+                    break;
                 }
                 else //Not finished, continue reading in a loop
                 {
