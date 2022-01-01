@@ -115,6 +115,7 @@ void et_process(struct epoll_event *events, int number, int epoll_fd, int listen
 
                     if (errno == EAGAIN || errno == EWOULDBLOCK)
                     {
+                        // 本次读取完毕
                         printf("read later!\n");
                         break;
                     }
