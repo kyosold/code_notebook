@@ -5,6 +5,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <libgen.h>
 #include <syslog.h>
 
 #define SLOG_DEBUG 7
