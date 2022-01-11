@@ -108,7 +108,8 @@ void et_process(struct epoll_event *events, int number, int epoll_fd, int listen
             while (1)
             {
                 memset(buf, 0, BUFFER_SIZE);
-                int ret = recv(sockfd, buf, BUFFER_SIZE - 1, 0);
+                //int ret = recv(sockfd, buf, BUFFER_SIZE - 1, 0);
+                int ret = read(sockfd, buf, BUFFER_SIZE);
                 if (ret < 0)
                 {
                     /* For non-congested IO, the following condition is true to indicate that the data has been read completely, after which epoll can trigger the EPOLLIN event on sockfd again to drive the next read operation */
@@ -132,6 +133,7 @@ void et_process(struct epoll_event *events, int number, int epoll_fd, int listen
                 else //Not finished, continue reading in a loop
                 {
                     printf("get %d bytes of content: %s\n", ret, buf);
+                    // need append string from buf
                 }
             }
 
