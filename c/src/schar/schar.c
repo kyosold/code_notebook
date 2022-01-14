@@ -9,7 +9,7 @@
 /**
  * 申请n个字节内存 (实际申请的是大于n可以整除的16的字节数)
  */
-char *_alloc(unsigned int n)
+static char *_alloc(unsigned int n)
 {
     char *x = NULL;
 
@@ -21,7 +21,7 @@ char *_alloc(unsigned int n)
     return x;
 }
 
-void _free(char *x)
+static void _free(char *x)
 {
     if (x)
         free(x);
@@ -32,7 +32,7 @@ void _free(char *x)
  * @param n 新的空间总大小，n 不能小于 m
  * @return 0:succ, 1:fail
  */
-int _realloc(char **x, unsigned int m, unsigned int n)
+static int _realloc(char **x, unsigned int m, unsigned int n)
 {
     char *y = NULL;
     y = _alloc(n);
@@ -277,7 +277,7 @@ int schar_stripos(schar *dest, char *substr, int substr_len, unsigned int offset
     haystack_dup = strdup(dest->s);
     if (haystack_dup == NULL)
         return SCHAR_NOTFOUND;
-    schar_strtolower(haystack_dup, dest->len);
+    _schar_strtolower(haystack_dup, dest->len);
 
     substr_dup = strdup(substr);
     if (substr_dup == NULL)
@@ -285,7 +285,7 @@ int schar_stripos(schar *dest, char *substr, int substr_len, unsigned int offset
         free(haystack_dup);
         return SCHAR_NOTFOUND;
     }
-    schar_strtolower(substr_dup, substr_len);
+    _schar_strtolower(substr_dup, substr_len);
 
     found = _schar_memnstr(haystack_dup + offset,
                            substr_dup,
@@ -374,7 +374,7 @@ char *schar_stristr_alloc(schar *dest, char *substr, int substr_len, unsigned in
     haystack_dup = strdup(dest->s);
     if (haystack_dup == NULL)
         return NULL;
-    schar_strtolower(haystack_dup, dest->len);
+    _schar_strtolower(haystack_dup, dest->len);
 
     substr_dup = strdup(substr);
     if (substr_dup == NULL)
@@ -382,7 +382,7 @@ char *schar_stristr_alloc(schar *dest, char *substr, int substr_len, unsigned in
         free(haystack_dup);
         return NULL;
     }
-    schar_strtolower(substr_dup, substr_len);
+    _schar_strtolower(substr_dup, substr_len);
 
     found = _schar_memnstr(haystack_dup + offset,
                            substr_dup,

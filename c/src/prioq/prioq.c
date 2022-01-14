@@ -6,7 +6,7 @@
 /**************************************************/
 #define ALIGNMENT 16 /* assuming that this alignment is enough */
 
-struct prioq_elt *_alloc(unsigned int n)
+static struct prioq_elt *_alloc(unsigned int n)
 {
     struct prioq_elt *x;
     n = ALIGNMENT + n - (n & (ALIGNMENT - 1));
@@ -15,7 +15,7 @@ struct prioq_elt *_alloc(unsigned int n)
     return x;
 }
 
-void _free(struct prioq_elt *x)
+static void _free(struct prioq_elt *x)
 {
     if (x)
     {
@@ -24,7 +24,7 @@ void _free(struct prioq_elt *x)
     }
 }
 
-int _alloc_re(struct prioq_elt **x, unsigned int old_size, unsigned int new_size)
+static int _alloc_re(struct prioq_elt **x, unsigned int old_size, unsigned int new_size)
 {
     struct prioq_elt *y = _alloc(new_size);
     if (!y)
