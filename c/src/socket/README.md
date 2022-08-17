@@ -228,7 +228,7 @@ if (n <= 0)
     return 1;
 }
 // 2.4 write
-snprintf(buf, sizeof(buf), "HELO sina.net\r\n");
+snprintf(buf, sizeof(buf), "HELO gpkeys.com\r\n");
 n = ssl_socket_write(ssl, socket_fd, buf, strlen(buf), timeout);
 printf("write[%d]: %s\n", n, buf);
 ```

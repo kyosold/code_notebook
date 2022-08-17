@@ -2,7 +2,7 @@
  * @Author: songjian <kyosold@qq.com>
  * @Date: 2022-08-15 15:24:14
  * @LastEditors: kyosold kyosold@qq.com
- * @LastEditTime: 2022-08-17 17:21:28
+ * @LastEditTime: 2022-08-17 17:27:17
  * @FilePath: /socket/example_ssl.c
  * @Description:
  *
@@ -173,7 +173,7 @@ int main(int argc, char **argv)
             return 1;
         }
         // 2.4 write
-        snprintf(buf, sizeof(buf), "HELO sina.net\r\n");
+        snprintf(buf, sizeof(buf), "HELO gpkeys.com\r\n");
         n = ssl_socket_write(ssl, socket_fd, buf, strlen(buf), 3);
         printf("write[%d]: %s\n", n, buf);
 
