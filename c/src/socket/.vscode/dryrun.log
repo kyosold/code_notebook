@@ -1,0 +1,10 @@
+make --dry-run --always-make --keep-going --print-directory
+make: Entering directory `/Users/grayson/Dev/github/code_notebook/c/src/socket'
+gcc -g -c -o socket_io.o socket_io.c
+gcc -g -c -o example.o example.c
+gcc -g -o example example.o socket_io.o -I/Users/grayson/Dev/src/openssl/MacOS_10.14/openssl-1.1.1m/include -L/Users/grayson/Dev/src/openssl/MacOS_10.14/openssl-1.1.1m/lib/ -lssl -lcrypto 
+gcc -g -c -o example_ssl.o example_ssl.c -Dssl_enable -I/Users/grayson/Dev/src/openssl/MacOS_10.14/openssl-1.1.1m/include 
+gcc -g -c -o socket_ssl_io.o socket_io.c -Dssl_enable -I/Users/grayson/Dev/src/openssl/MacOS_10.14/openssl-1.1.1m/include 
+gcc -g -o example_ssl example_ssl.o socket_ssl_io.o -DSSL -I/Users/grayson/Dev/src/openssl/MacOS_10.14/openssl-1.1.1m/include -L/Users/grayson/Dev/src/openssl/MacOS_10.14/openssl-1.1.1m/lib/ -lssl -lcrypto 
+make: Leaving directory `/Users/grayson/Dev/github/code_notebook/c/src/socket'
+ 

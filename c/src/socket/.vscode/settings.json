@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "*.tpl": "php",
+        "socket_io.h": "c"
+    }
+}
