@@ -5,7 +5,7 @@
         gcc -g s_generate_eml.c base64.c
 
     Usage:
-        ./a.out -f'songjian@luobo.sina.net' -t'kyosold@qq.com' -s'上周账单提醒' -i./test.log -o test.eml
+        ./a.out -f'kyosold@gpkeys.com' -t'kyosold@qq.com' -s'上周账单提醒' -i./test.log -o test.eml
 */
 
 #include <stdio.h>

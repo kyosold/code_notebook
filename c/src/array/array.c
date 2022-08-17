@@ -508,7 +508,7 @@ void main(int argc, char **argv)
         free(str);
     }
 
-    char *ss = "May 11 14:03:32 10.75.30.234 spam_filter[39641]: log_headers 13831F99630C4DC2A47EDB590F43191A LOGPrase log_headers[Subject: Njg4Mzg4ODAxMCAtIENPU0NPIFNISVBQSU5HIExp] filter_true:0 cip:10.75.30.48 envfrom:postmaster@sinanet.com envto:mailback@sunway-logistics.sinanet.com";
+    char *ss = "May 11 14:03:32 10.75.30.234 spam_filter[39641]: log_headers 13831F99630C4DC2A47EDB590F43191A LOGPrase log_headers[Subject: 5rWL6K+V5qCH6aKY77yM5rWL6K+V5LiA5LiL] filter_true:0 cip:10.75.30.48 envfrom:kyosold@gpkeys.com envto:kyosold@qq.com";
     array *ss_array = array_explode_alloc(" ", ss);
     array_dump(ss_array, stderr);
     array_del(ss_array);
