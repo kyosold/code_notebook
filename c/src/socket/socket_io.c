@@ -2,7 +2,7 @@
  * @Author: songjian <kyosold@qq.com>
  * @Date: 2022-08-11 11:29:24
  * @LastEditors: kyosold kyosold@qq.com
- * @LastEditTime: 2022-08-17 17:14:12
+ * @LastEditTime: 2022-08-18 17:07:32
  * @FilePath: /socket/socket_io.c
  * @Description:
  *  Build:
@@ -450,24 +450,54 @@ SSL_CTX *ssl_socket_new_ctx(int method)
     }
 
     if (ctx == NULL)
+    {
         snprintf(socket_err, sizeof(socket_err), "SSL_CTX_new(SSLv23_client_method()) fail");
+        return NULL;
+    }
+
+    // 设置可信CA证书的默认位置
+    SSL_CTX_set_default_verify_paths(ctx);
+
     return ctx;
 }
 /**
- * @description:
+ * @description: 设置可信CA的证书位置 （可选）
+ * @param {SSL_CTX} *ctx
+ * @param {char} *ca_file
+ * @param {char} *ca_path
+ * @return {*} 0:成功，1:失败
+ * 如果不调用此函数，则会使用CA证书的默认位置和证书。
+ * 默认的CA证书目录在默认的OpenSSL目录中称为certs，具体查看:
+ *  https://www.openssl.org/docs/manmaster/man3/SSL_CTX_load_verify_locations.html
+ */
+int load_ca_cert(SSL_CTX *ctx, char *ca_file, char *ca_path)
+{
+    if (!SSL_CTX_load_verify_locations(ctx, ca_file, ca_path))
+    {
+        snprintf(socket_err, sizeof(socket_err), "SSL_CTX_load_verify_locations: %s", get_error_info());
+        return 1;
+    }
+    return 0;
+}
+/**
+ * @description:    设置我方的证书和私钥
  * @param {SSL_CTX} *ctx        指向由 ssl_socket_new_ctx 生成的对象
- * @param {char} *cert_file     证书文件，包含CA和自己的证书
+ * @param {char} *cert_file     证书文件，CA颁发给我们的证书
  * @param {char} *key_file      自己的私钥
  * @param {char} *password      自己私钥的密码，如果没有写 NULL
  * @return {*}  -1:fail, 0:success
  */
 int load_certificates(SSL_CTX *ctx, char *cert_file, char *key_file, char *password)
 {
-    /* 指定ctx的位置，用于验证CA证书所在的位置 */
-    if (!SSL_CTX_load_verify_locations(ctx, cert_file, NULL))
-        snprintf(socket_err, sizeof(socket_err), "SSL_CTX_load_verify_locations: %s", get_error_info());
+    if (load_ca_cert(ctx, cert_file, NULL))
+    {
+        snprintf(socket_err, sizeof(socket_err), "set we cert file fail");
+        return -1;
+    }
+
     /* 将证书链从文件加载到ctx中，证书必须采用PEM格式 */
     if (SSL_CTX_use_certificate_chain_file(ctx, key_file) != 1)
+    // if (SSL_CTX_use_certificate_chain_file(ctx, cert_file) != 1)
     {
         snprintf(socket_err, sizeof(socket_err), "SSL_CTX_use_certificate_chain_file: %s", get_error_info());
         SSL_CTX_free(ctx);
@@ -494,34 +524,70 @@ int load_certificates(SSL_CTX *ctx, char *cert_file, char *key_file, char *passw
 
     return 0;
 }
-static int verify_flag = SSL_SOCKET_VERIFY_NONE;
+
 /**
  * @description: 验证回调函数
  * @param {int} preverify_ok        是否通过了相关证书的验证: 1(通过), 0(未通过)
  * @param {X509_STORE_CTX} *ctx     指向用于证书链难的完整上下文的指针
  * @return {int}  返回值控制着进一步验证过程的策略。如果返回0，则验证过程立即以"验证失败"状态停止。
  * 如果设置了 SSL_VERIFY_PEER，则会向对方发送验证失败警报，并终止 TLS/SSL 握手。如果返回1，则继续验证。
+ * 更多的错误类型查看: https://www.openssl.org/docs/man1.0.2/man3/X509_STORE_CTX_get_error.html
  */
 static int verify_cb(int preverify_ok, X509_STORE_CTX *ctx)
 {
     char buf[1024] = {0};
-    printf("SSL Verify Certificates res: %d\n", preverify_ok);
+    X509 *cert = X509_STORE_CTX_get_current_cert(ctx);
+    X509_NAME_oneline(X509_get_issuer_name(cert), buf, sizeof(buf));
+    printf("Verify Ceritficates:\n");
+    printf("  issuer  = %s\n", buf);
+    X509_NAME_oneline(X509_get_subject_name(cert), buf, sizeof(buf));
+    printf("  subject = %s\n", buf);
+
+    int cert_error = X509_STORE_CTX_get_error(ctx);
+    printf("  SSL Verify Certificates res(%d) cert error(%d)\n", preverify_ok, cert_error);
+    printf("------\n");
     if (!preverify_ok)
     {
-        X509 *cert = X509_STORE_CTX_get_current_cert(ctx);
         int depth = X509_STORE_CTX_get_error_depth(ctx);
         int err = X509_STORE_CTX_get_error(ctx);
 
-        printf("Error with certificate at depth: %d\n", depth);
-        X509_NAME_oneline(X509_get_issuer_name(cert), buf, sizeof(buf));
-        printf("  issuer= %s\n", buf);
-        X509_NAME_oneline(X509_get_subject_name(cert), buf, sizeof(buf));
-        printf("  subject= %s\n", buf);
-        printf("  err %d:%s", err, X509_verify_cert_error_string(err));
-        snprintf(socket_err, sizeof(socket_err), "  err %d:%s", err, X509_verify_cert_error_string(err));
+        switch (cert_error)
+        {
+        case X509_V_ERR_UNABLE_TO_GET_CRL_ISSUER:
+        case X509_V_ERR_KEYUSAGE_NO_CRL_SIGN:           // 无法获取颁发者证书
+        case X509_V_ERR_DIFFERENT_CRL_SCOPE:            // 唯一可以找到的 CRL 与证书的范围不匹配
+        case X509_V_ERR_CRL_PATH_VALIDATION_ERROR:      // CRL 路径验证错误
+        case X509_V_ERR_ERROR_IN_CRL_LAST_UPDATE_FIELD: // CRL lastUpdate 字段包括无效时间
+        case X509_V_ERR_CRL_NOT_YET_VALID:              // CRL 尚未生效
+        case X509_V_ERR_ERROR_IN_CRL_NEXT_UPDATE_FIELD: // CRL nextUpdate 字段包含无效时间
+        case X509_V_ERR_CRL_HAS_EXPIRED:                // CRL 已过期
+        case X509_V_ERR_CRL_SIGNATURE_FAILURE:          // CRL 签名无效
+        case X509_V_ERR_UNABLE_TO_GET_CRL:              // 找不到证书的 CRL
+            preverify_ok = 1;
+            /* 要求: 证书撤销列表本地的错误，不应该导致客户端连接不成功 */
+            /* 检查证书的时候，若失败，线程投递错误，导致ssl_read失败 */
+
+            break;
+        default:
+            printf("-Error with certificate at depth: %d\n", depth);
+            printf("  err %i:%s\n", err, X509_verify_cert_error_string(err));
+            snprintf(socket_err, sizeof(socket_err), "err %i:%s", err, X509_verify_cert_error_string(err));
+            break;
+        }
     }
+
+    /* 在回调中修改了函数返回值，让crl的错误返回成功，但是错误还投递了，这里让他清空一下。*/
+    ERR_clear_error();
+
     return preverify_ok;
 }
+/**
+ * @description: 设置是否验证对方证书
+ * @param {SSL_CTX} *ctx
+ * @param {int} bit         SSL_SOCKET_VERIFY_NONE 或 SSL_SOCKET_VERIFY
+ * @param {int} depth       证书链的深度
+ * @return {*}
+ */
 void ssl_socket_set_verify_certificates(SSL_CTX *ctx, int bit, int depth)
 {
     // 设置证书验证模式和回调
@@ -553,7 +619,6 @@ void ssl_socket_set_verify_certificates(SSL_CTX *ctx, int bit, int depth)
      *
      * @note: 必须随时设置模式标志 SSL_VERIFY_NONE 和 SSL_VERIFY_PEER之一。
      */
-    verify_flag = bit;
     if (bit == SSL_SOCKET_VERIFY_NONE)
         SSL_CTX_set_verify(ctx, SSL_VERIFY_NONE, NULL);
     else
@@ -566,13 +631,13 @@ void ssl_socket_set_verify_certificates(SSL_CTX *ctx, int bit, int depth)
 /**
  * @description:    设置可用的算法列表
  * @param {SSL_CTX} *ctx
- * @param {char} *ciphers   可用的算法列表
+ * @param {char} *ciphers   可用的算法列表 (ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH)
  * @return {*}  成功返回1，失败返回0
  */
 int ssl_socket_set_cipher_list_serv(SSL_CTX *ctx, const char *ciphers)
 {
     if (!ciphers || !*ciphers)
-        return SSL_CTX_set_cipher_list(ctx, "DEFAULT");
+        return SSL_CTX_set_cipher_list(ctx, CIPHER_LIST);
     else
         return SSL_CTX_set_cipher_list(ctx, ciphers);
 }
@@ -627,6 +692,48 @@ int ssl_socket_set_cipher_file_serv(SSL_CTX *ctx, char *cipher_file)
     free(cipher);
 
     return (n == 0) ? -1 : 0;
+}
+static char dhdir[1024] = {0};
+DH *tmp_dh_cb(SSL *ssl, int is_export, int keylen)
+{
+    char dh_file[2048] = {0};
+
+    if (keylen == 512)
+    {
+        snprintf(dh_file, sizeof(dh_file), "%s/dh512.pem", dhdir);
+        FILE *fp = fopen(dh_file, "r");
+        if (fp)
+        {
+            DH *dh = PEM_read_DHparams(fp, NULL, NULL, NULL);
+            fclose(fp);
+            if (dh)
+                return dh;
+        }
+    }
+    if (keylen == 1024)
+    {
+        snprintf(dh_file, sizeof(dh_file), "%s/dh1024.pem", dhdir);
+        FILE *fp = fopen(dh_file, "r");
+        if (fp)
+        {
+            DH *dh = PEM_read_DHparams(fp, NULL, NULL, NULL);
+            fclose(fp);
+            if (dh)
+                return dh;
+        }
+    }
+    return DH_generate_parameters(keylen, DH_GENERATOR_2, NULL, NULL);
+}
+/**
+ * @description:    设置为临时密钥交换处理 DH 密钥
+ * @param {SSL_CTX} *ctx
+ * @param {char} *dh_path   保存dh密钥的目录，目录下应该有: dh512.pem dh1024.pem 两个文件
+ * @return {*}
+ */
+void ssl_socket_set_tmp_dh_path(SSL_CTX *ctx, char *dh_path)
+{
+    snprintf(dhdir, sizeof(dhdir), "%s", dh_path);
+    SSL_CTX_set_tmp_dh_callback(ctx, tmp_dh_cb);
 }
 /**
  * @description:    释放由ssl_new_ctx生成的指针
@@ -875,6 +982,11 @@ int ssl_socket_write(SSL *ssl, int fd, char *buf, size_t buf_len, int timeout)
     return ssl_timeoutio(SSL_write, ssl, fd, fd, timeout, buf, buf_len);
 }
 
+/**
+ * @description: 显示证书信息
+ * @param {SSL} *ssl
+ * @return {*}
+ */
 void show_certs(SSL *ssl)
 {
     X509 *cert;
@@ -888,7 +1000,7 @@ void show_certs(SSL *ssl)
         printf("Subject: %s\n", line);
         free(line);
         line = X509_NAME_oneline(X509_get_issuer_name(cert), 0, 0);
-        printf("Issuer: %s\n", line);
+        printf("Issuer: %s\n", line); // 证书颁发者
         free(line);
         X509_free(cert);
     }

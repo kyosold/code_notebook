@@ -201,7 +201,7 @@ if (ssl == NULL) {
     printf("ssl_socket_free_ctx fail: %s\n", get_socket_error_info());
     return 1;
 }
-// show certificates
+// show certificates (可选)
 show_certs(ssl);	// 不需要可以不写
 ```
 4). Read/Write
@@ -306,6 +306,7 @@ int process_child(int conn_fd, char *cert_file, char *key_file)
         printf("ssl_socket_new_ctx cert_file(%s) key_file(%s) fail: %s\n", cert_file, key_file, get_socket_error_info());
         return -1;
     }
+    // 加载服务器CA证书和私钥
     load_certificates(ctx, cert_file, key_file, NULL);
 
     // 3.2 使用accept生成ssl
@@ -317,7 +318,7 @@ int process_child(int conn_fd, char *cert_file, char *key_file)
         printf("ssl_socket_accept fail: %s\n", get_socket_error_info());
         return -1;
     }
-    // 3.4 show certificates
+    // 3.4 show certificates (可选)
     show_certs(ssl);
 
     // 3.3 process

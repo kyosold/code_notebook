@@ -2,7 +2,7 @@
  * @Author: songjian <kyosold@qq.com>
  * @Date: 2022-08-15 15:24:14
  * @LastEditors: kyosold kyosold@qq.com
- * @LastEditTime: 2022-08-17 17:27:17
+ * @LastEditTime: 2022-08-18 17:05:38
  * @FilePath: /socket/example_ssl.c
  * @Description:
  *
@@ -20,6 +20,8 @@
 
 #include "socket_io.h"
 
+char dh_path[1024] = "./";
+
 int process_child(int conn_fd, char *cert_file, char *key_file)
 {
     SSL_CTX *ctx = NULL;
@@ -36,7 +38,13 @@ int process_child(int conn_fd, char *cert_file, char *key_file)
         printf("ssl_socket_new_ctx cert_file(%s) key_file(%s) fail: %s\n", cert_file, key_file, get_socket_error_info());
         return -1;
     }
+    // 3.2 读取服务器证书和私钥
     load_certificates(ctx, cert_file, key_file, NULL);
+
+    // 3.3 设置可使用的算法(可选)
+    // ssl_socket_set_cipher_file_serv(ctx, "./cipher.txt");
+    // 3.4 设置为临时密钥交换处理 DH 密钥 (可选，且仅用于服务器)
+    // ssl_socket_set_tmp_dh_path(ctx, dh_path);
 
     // 3.2 使用accept生成ssl
     ssl = ssl_socket_accept(ctx, conn_fd, 10);
@@ -147,16 +155,16 @@ int main(int argc, char **argv)
             return 1;
         }
         // 2.2 设置证书验证方式
-        ssl_socket_set_verify_certificates(ctx, SSL_SOCKET_VERIFY_ALL, 10);
+        ssl_socket_set_verify_certificates(ctx, SSL_SOCKET_VERIFY, 10);
         // 2.2 使用ssl连接
         ssl = ssl_socket_connect(ctx, socket_fd, 3);
         if (ssl == NULL)
         {
             ssl_socket_free_ctx(ctx);
-            printf("ssl_socket_free_ctx fail: %s\n", get_socket_error_info());
+            printf("ssl_socket_connect fail: %s\n", get_socket_error_info());
             return 1;
         }
-        // 3.4 show certificates
+        // show certificates （可选）
         show_certs(ssl);
         // 2.3 read
         char buf[1024] = {0};

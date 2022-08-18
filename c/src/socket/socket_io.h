@@ -2,7 +2,7 @@
  * @Author: songjian <kyosold@qq.com>
  * @Date: 2022-08-11 11:29:32
  * @LastEditors: kyosold kyosold@qq.com
- * @LastEditTime: 2022-08-17 16:27:49
+ * @LastEditTime: 2022-08-18 16:56:44
  * @FilePath: /socket/socket_io.h
  * @Description:
  *
@@ -42,17 +42,18 @@ void *get_in_addr(struct sockaddr *sa);
 #ifdef ssl_enable
 #include <openssl/ssl.h>
 
-#define SSL_SOCKET_VERIFY_NONE 0   // 不做验证
-#define SSL_SOCKET_VERIFY_EXPIRE 1 // 第1位
-#define SSL_SOCKET_VERIFY_DOMAIN 2 // 第2位
-#define SSL_SOCKET_VERIFY_CHAIN 4  // 第3位
-#define SSL_SOCKET_VERIFY_ALL 7    // 第3位全是1
+#define SSL_SOCKET_VERIFY_NONE 0 // 不做验证
+#define SSL_SOCKET_VERIFY 1      // 做验证
+
+#define CIPHER_LIST "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH"
 
 SSL_CTX *ssl_socket_new_ctx(int method);
+int load_ca_cert(SSL_CTX *ctx, char *ca_file, char *ca_path);
 int load_certificates(SSL_CTX *ctx, char *cert_file, char *key_file, char *password);
 void ssl_socket_set_verify_certificates(SSL_CTX *ctx, int bit, int depth);
 int ssl_socket_set_cipher_list_serv(SSL_CTX *ctx, const char *ciphers);
 int ssl_socket_set_cipher_file_serv(SSL_CTX *ctx, char *cipher_file);
+void ssl_socket_set_tmp_dh_path(SSL_CTX *ctx, char *dh_path);
 void ssl_socket_free_ctx(SSL_CTX *ctx);
 
 SSL *ssl_socket_connect(SSL_CTX *ctx, int fd, int timeout);
