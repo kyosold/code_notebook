@@ -2,11 +2,48 @@
  * @Author: songjian <kyosold@qq.com>
  * @Date: 2022-08-15 15:24:14
  * @LastEditors: kyosold kyosold@qq.com
- * @LastEditTime: 2022-08-18 17:05:38
+ * @LastEditTime: 2022-08-19 08:21:31
  * @FilePath: /socket/example_ssl.c
  * @Description:
  *
  * Copyright (c) 2022 by kyosold kyosold@qq.com, All Rights Reserved.
+ *
+ * ////////////////////////////////////////////////////////////
+ * Generate certificate myself sign:
+ *  1. generate private key:
+ *      openssl genrsa -out serv.key 1024
+ *  2. generate request csr:
+ *      openssl req -new -key serv.key -out serv.csr
+ *  3. generate certificate myself sign:
+ *      openssl x509 -req -in serv.csr -out serv.crt -signkey serv.key -days 365
+ *  4. generate serv.pem:
+ *      cat serv.crt serv.key > serv.pem
+ * Usage:
+ *  1. Server mode for listen 33399:
+ *      ./example_ssl listen 33399 cert/serv.crt cert/serv.pem
+ *  2. Client mode:
+ *      ./example_ssl conn smtp.qq.com 465
+ * ////////////////////////////////////////////////////////////
+ * Generate certificate CA myself sign:
+ *  1. generate CA private key and certificate:
+ *      openssl genrsa -out ca_private.key 2048
+ *      openssl req -x509 -new -nodes -key ca_private.key -out ca_private.pem -days 365
+ *  2. generate server's private key and csr:
+ *      openssl genrsa -out serv_private.key 2048
+ *      openssl req -new -key serv_private.key -out serv_private.csr
+ *  3. sign csr with private key and certificate of CA mysel:
+ *      openssl x509 -req -in serv_private.csr -CA ca_private.pem -CAkey ca_private.key -CAcreateserial -out serv_private.crt -days 365
+ *  4. generate serv.pem:
+ *      cat serv_private.crt serv_private.key > serv_private.pem
+ * Usage:
+ *  1. Server mode for listen 33399:
+ *      ./example_ssl listen 33399 cert/serv_private.crt cert/serv_private.pem
+ *  2. Client mode:
+ *      ./example_ssl conn 10.23.2.30 33399
+ *      note:
+ *          there is an error(err 20:unable to get local issuer certificate), because the certificate of
+ *      ca_my is not at /etc/ssl/, so fix it to add code after ssl_socket_new_ctx:
+ *          load_ca_cert(ctx, "./cert/ca_private.pem", "./cert");
  */
 #include <stdio.h>
 #include <string.h>

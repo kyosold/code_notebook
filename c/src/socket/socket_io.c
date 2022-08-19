@@ -2,7 +2,7 @@
  * @Author: songjian <kyosold@qq.com>
  * @Date: 2022-08-11 11:29:24
  * @LastEditors: kyosold kyosold@qq.com
- * @LastEditTime: 2022-08-18 17:07:32
+ * @LastEditTime: 2022-08-19 08:06:59
  * @FilePath: /socket/socket_io.c
  * @Description:
  *  Build:
@@ -483,7 +483,9 @@ int load_ca_cert(SSL_CTX *ctx, char *ca_file, char *ca_path)
  * @description:    设置我方的证书和私钥
  * @param {SSL_CTX} *ctx        指向由 ssl_socket_new_ctx 生成的对象
  * @param {char} *cert_file     证书文件，CA颁发给我们的证书
- * @param {char} *key_file      自己的私钥
+ * @param {char} *key_file      证书链文件和我们的私钥，该文件需要包含证书链和私钥内容，
+ *                              可以使用以下命令生成:
+ *                                  cat p1.crt p2.crt p3.crt serv.key > serv.pem
  * @param {char} *password      自己私钥的密码，如果没有写 NULL
  * @return {*}  -1:fail, 0:success
  */
